@@ -1,0 +1,31 @@
+//----Grid----------------------
+Nx=256
+Ny=256
+
+//-Dimensions-------------------
+Xlen=1.0
+Ylen=1.0
+
+//-Time analysis----------------
+Breakdown_Time = T
+
+//---Mesh Refinement------------
+
+mesh_ref = 0.0
+Semi_implicit=F
+//------------------------------
+cfl = 0.25
+
+//--End time--------------------
+
+Tend = 30.0
+Max_dt = 1.0
+
+//--Physical properties---------
+mu1 = 0.001
+
+//-----Solver parameter--------
+//---1:SOR-RB--2:JOR-----------
+which_solver = 1
+Beta = 1.0
+maxit = 100
