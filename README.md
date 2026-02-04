@@ -139,7 +139,7 @@ make -j$(nproc)
 
    # test version 
    cd test/ 
-   ../../build/bin/ldc_test
+   ../build/bin/ldc_test
    ```
 
 3. **Output files**:
@@ -222,13 +222,14 @@ Parallelized operations:
 
 ## Performance
 
-### Typical Performance (Example: 512×512 grid, Re=1000)
-
+### Typical Performance (Example: 256×256 grid, Re=1000)
+### 5000 time steps 
 | Version | Threads | Time (s) | Speedup |
 |---------|---------|----------|---------|
-| Serial  | 1       |          | 1.0×   |
-| OpenMP  | 4       |          | 1.9×   |
-| OpenMP  | 8       |          | 2.3×   |
+| Serial  | 1       |   296    | 1.0×   |
+| OpenMP  | 2       |   161    | 1.83×  |
+| OpenMP  | 4       |   108    | 2.73×  |
+| OpenMP  | 8       |    81    | 3.62x  |
 
 *Note: Run your own benchmarks and update this table*
 
