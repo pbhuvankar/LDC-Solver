@@ -36,6 +36,17 @@ if(BUILD_OPENMP AND OpenMP_CXX_FOUND)
     message(STATUS "Building OpenMP executable: ldc_openmp")
 endif()
 
+# Test executable
+if(BUILD_TEST)
+    add_executable(ldc_test tests.cpp ${LDC_SOURCES})
+    target_include_directories(ldc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    set_target_properties(ldc_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    
+    message(STATUS "Building test executable: ldc_test")
+endif()
+
 # Install targets
 if(BUILD_SERIAL)
     install(TARGETS ldc_serial DESTINATION bin)
@@ -43,4 +54,8 @@ endif()
 
 if(BUILD_OPENMP AND OpenMP_CXX_FOUND)
     install(TARGETS ldc_openmp DESTINATION bin)
+endif()
+
+if(BUILD_TEST)
+    install(TARGETS ldc_test DESTINATION bin)
 endif()

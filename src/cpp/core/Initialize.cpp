@@ -1,7 +1,7 @@
 #include "LDC.hpp"
 #include<sstream>
 
-void initialize(Grid& grid, Momentum& mom, Solver& solver) 
+void read_params(Grid& grid, Momentum& mom, Solver& solver) 
 {
     // Reading input parameters
     std::ifstream infile("input");
@@ -37,6 +37,7 @@ void initialize(Grid& grid, Momentum& mom, Solver& solver)
             else if (key == "mu1") iss >> mom.mu1;
             else if (key == "Beta") iss >> grid.beta;
             else if (key == "maxit") iss >> solver.maxit;
+            else if (key == "t_scheme") iss >> solver.t_scheme;
             else if (key == "which_solver") iss >> solver.which_solver;
             else if (key == "Semi_implicit") 
             {
@@ -53,15 +54,17 @@ void initialize(Grid& grid, Momentum& mom, Solver& solver)
         }
     }
     infile.close();
-    
+}
+void initialize(Grid& grid, Momentum& mom, Solver& solver) 
+{    
     // Set grid indices
     grid.is= 3;
     grid.ie= grid.Nx + 2;
-    grid.Nxt= grid.Nx + 4;
+    grid.Nxt= grid.Nx + 5;
     
     grid.js= 3;
     grid.je= grid.Ny + 2;
-    grid.Nyt= grid.Ny + 4;
+    grid.Nyt= grid.Ny + 5;
     
     grid.Nt= grid.Nxt * grid.Nyt;
     
@@ -81,6 +84,10 @@ void initialize(Grid& grid, Momentum& mom, Solver& solver)
     mom.du.resize(grid.Nt, 0.0);
     mom.dv.resize(grid.Nt, 0.0);
     mom.mask.resize(grid.Nt, 0.0);
+
+    mom.u_old.resize(grid.Nt, 0.0);
+    mom.v_old.resize(grid.Nt, 0.0);
+    mom.p_old.resize(grid.Nt, 0.0);
     
     grid.x.resize(grid.Nxt, 0.0);
     grid.y.resize(grid.Nyt, 0.0);

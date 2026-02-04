@@ -21,7 +21,7 @@ ldc_openmp
 # Output directories
 output/
 Output/
-Visualize/
+#Visualize/
 Profile/
 
 # Python

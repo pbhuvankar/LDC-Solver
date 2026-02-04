@@ -27,11 +27,13 @@ LDC-Solver/
 │   │   ├── Initialize.cpp
 │   │   ├── Projection.cpp
 │   │   └── Solver.cpp
+|   |   |__ tests.cpp
 │   └── python/
-│       ├── prototype/          # Python prototype (TODO)
+│       ├── prototype/          # Python prototype
 │       └── visualization/      # Plotting tools
 │           ├── visualize_ldc.py
 │           └── benchmark_ldc.py
+|           |__ visualize_tests.py
 ├── benchmarks/
 │   └── data/                   # Reference data and input files
 ├── examples/
@@ -42,7 +44,7 @@ LDC-Solver/
 ├── build/                      # CMake build directory (generated)
 ├── output/                     # Simulation results (generated)
 ├── Profile/                    # Performance profiling (generated)
-└── Visualize/                  # Visualization outputs (generated)
+└── tests/                      # Test of convection, diffusion & pressure solver
 ```
 
 ## Dependencies
@@ -104,6 +106,7 @@ make -j$(nproc)
 - `CMAKE_BUILD_TYPE`: `Release` (default) or `Debug`
 - `BUILD_OPENMP`: Build OpenMP parallel version (default: ON)
 - `BUILD_SERIAL`: Build serial version (default: ON)
+- `BUILD_TEST`: Build test version (default: ON)
 - `ENABLE_PROFILING`: Enable detailed timing profiling (default: OFF)
 
 ## Usage
@@ -130,8 +133,13 @@ make -j$(nproc)
    ../../build/bin/ldc_serial
    
    # OpenMP version (set threads)
+   cd examples/basic_cavity
    export OMP_NUM_THREADS=4
    ../../build/bin/ldc_openmp
+
+   # test version 
+   cd test/ 
+   ../../build/bin/ldc_test
    ```
 
 3. **Output files**:
@@ -148,6 +156,11 @@ python ../../src/python/visualization/visualize_ldc.py
 
 # Compare with benchmark data
 python ../../src/python/visualization/benchmark_ldc.py
+
+# Generate test plots for convection, diffusion with manufactured solution: 
+# U = xy(1-x)(1-y), V = 2xy(1-x)(1-y),  Poisson test with: Nabla^2(p) = -8pi^2 cos(2pi x)cos(2pi y)
+cd test/
+python ../src/python/visualization/visualize_tests.py
 ```
 
 Generated plots:
@@ -209,13 +222,13 @@ Parallelized operations:
 
 ## Performance
 
-### Typical Performance (Example: 256×256 grid, Re=1000)
+### Typical Performance (Example: 512×512 grid, Re=1000)
 
 | Version | Threads | Time (s) | Speedup |
 |---------|---------|----------|---------|
-| Serial  | 1       | ~TBD     | 1.0×    |
-| OpenMP  | 4       | ~TBD     | ~TBD×   |
-| OpenMP  | 8       | ~TBD     | ~TBD×   |
+| Serial  | 1       |          | 1.0×   |
+| OpenMP  | 4       |          | 1.9×   |
+| OpenMP  | 8       |          | 2.3×   |
 
 *Note: Run your own benchmarks and update this table*
 
@@ -287,15 +300,15 @@ pip install numpy matplotlib scipy
 
 ## License
 
-[Your chosen license]
+MIT
 
 ## Contributing
 
-[Your contribution guidelines]
+-
 
 ## Authors
 
-[Your name/team]
+Pramod Bhuvankar
 
 ## Acknowledgments
 

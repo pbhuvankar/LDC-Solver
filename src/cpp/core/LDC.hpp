@@ -38,6 +38,7 @@ struct Momentum
     std::vector<double> u, v, p;            //u, v, p flattened vectors
     std::vector<double> u0, v0, p0;
     std::vector<double> du, dv, mask;
+    std::vector<double> u_old, v_old, p_old;
     
     double dt, time;
     double mu1, Tend;
@@ -50,14 +51,20 @@ struct Solver
     std::vector<double> A1, A2, A3, A4, A5, A6; //Store coefficients of linear equations with inhomogeneous spacing
     int which_solver;                           // 1--SOR (Red/Black), 2--JOR
     int maxit;
+    int t_scheme;
 };
 
 // Function declarations
+void read_params(Grid& grid, Momentum& mom, Solver& solver); 
+
 void initialize(Grid& grid, Momentum& mom, Solver& solver); //Initialize the grid, fields, and solver
 
 void timestep(Grid& grid, Momentum& mom);                   //Computes time-stepping based on CFL criterion & scheme style
 
-void UVBoundaryCond(std::vector<double>& u, std::vector<double>& v, const Grid& grid); 
+void UVBoundaryCond(std::vector<double>& u, std::vector<double>& v, const Grid& grid, const double uw); 
+
+void RecordOldFields(Grid&grid, Momentum& mom);
+void LeapFrog(Grid&grid, Momentum& mom);
 
 void convection(std::vector<double>& du1, std::vector<double>& dv1, 
     //const 

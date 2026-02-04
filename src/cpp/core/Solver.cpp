@@ -56,7 +56,7 @@ void SetPressurePoi(Grid& grid, Momentum& mom, Solver& solver)
     solver.A2[root_ij_k]=0.0;
     solver.A3[root_ij_k]=0.0;
     solver.A4[root_ij_k]=0.0;
-    solver.A5[root_ij_k]=solver.A5[ij_k(is+2, js+2, Nxt)];
+    solver.A5[root_ij_k]=1.0;//solver.A5[ij_k(is+2, js+2, Nxt)];
     solver.A6[root_ij_k]=0.0;
     
     mom.ind[0]=is;

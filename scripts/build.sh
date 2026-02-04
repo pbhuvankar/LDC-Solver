@@ -32,6 +32,7 @@ fi
 BUILD_TYPE="Release"
 BUILD_OPENMP=ON
 BUILD_SERIAL=ON
+BUILD_TEST=ON
 CLEAN=false
 
 while [[ $# -gt 0 ]]; do
@@ -48,6 +49,10 @@ while [[ $# -gt 0 ]]; do
             BUILD_SERIAL=OFF
             shift
             ;;
+        --no-test)
+            BUILD_TEST=OFF
+            shift
+            ;;    
         --clean)
             CLEAN=true
             shift
@@ -59,6 +64,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --debug       Build in debug mode (default: Release)"
             echo "  --no-openmp   Don't build OpenMP version"
             echo "  --no-serial   Don't build serial version"
+            echo "  --no-test     Don't build test version"
             echo "  --clean       Clean build directory before building"
             echo "  --help        Show this help message"
             echo ""
@@ -96,6 +102,7 @@ echo "Running CMake..."
 cmake .. \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
     -DBUILD_OPENMP="$BUILD_OPENMP" \
+    -DBUILD_TEST="$BUILD_TEST" \
     -DBUILD_SERIAL="$BUILD_SERIAL"
 
 # Build

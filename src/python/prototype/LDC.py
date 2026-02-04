@@ -18,7 +18,7 @@ import os
 import operators as op
 import ghia_data as gh
 #--------LDC Parameters defined----------------#
-N = 48
+N = 40
 L = 1.0
 Re = 1000.0
 tf = 30.0

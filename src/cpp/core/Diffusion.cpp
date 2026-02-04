@@ -63,13 +63,13 @@ void diffusionU(std::vector<double>& du1, int flg, Grid& grid, Momentum& mom, So
     if (flg == 1) 
     {
         // Boundary conditions for implicit solver
-        for (int j= 1; j<= Nyt; j++) 
+        for (int j= 1; j< Nyt; j++) 
         {
             solver.A1[ij_k(is, j, Nxt)]= 0.0;
             solver.A2[ij_k(ieu, j, Nxt)]= 0.0;
         }
         
-        for (int i= 1; i<= Nxt; i++) 
+        for (int i= 1; i< Nxt; i++) 
         {
             // Bottom wall
             int ij_js= ij_k(i, js, Nxt);
@@ -161,13 +161,13 @@ void diffusionV(std::vector<double>& dv1, int flg, Grid& grid, Momentum& mom, So
     if (flg == 1) 
     {
         // Boundary conditions for implicit solver        
-        for (int i= 1; i<= Nxt; i++) 
+        for (int i= 1; i< Nxt; i++) 
         {
             solver.A3[ij_k(i, js, Nxt)]= 0.0;
             solver.A4[ij_k(i, jev, Nxt)]= 0.0;
         }
         
-        for (int j= 1; j<= Nyt; j++) 
+        for (int j= 1; j< Nyt; j++) 
         {
             // Left wall----zero tangential velocity hard-coded
             int ij_is= ij_k(is, j, Nxt);

@@ -1,7 +1,7 @@
 #include "LDC.hpp"
 
 // Boundary conditions for U and V velocities - OPENMP OPTIMIZED
-void UVBoundaryCond(std::vector<double>& u, std::vector<double>& v, const Grid& grid) {
+void UVBoundaryCond(std::vector<double>& u, std::vector<double>& v, const Grid& grid, const double uw) {
     const int Nxt= grid.Nxt;
     const int is= grid.is;
     const int ie= grid.ie;
@@ -38,7 +38,7 @@ void UVBoundaryCond(std::vector<double>& u, std::vector<double>& v, const Grid& 
         // Top wall - lid-driven cavity with velocity= 1.0
         v[ij_k(i, je, Nxt)]= 0.0;
         v[ij_k(i, je+1, Nxt)]= -v[ij_k(i, je-1, Nxt)];
-        u[ij_k(i, je+1, Nxt)]= 2.0*1.0 - u[ij_k(i, je, Nxt)];
-        u[ij_k(i, je+2, Nxt)]= 2.0*1.0 - u[ij_k(i, je-1, Nxt)];
+        u[ij_k(i, je+1, Nxt)]= 2.0*uw - u[ij_k(i, je, Nxt)];
+        u[ij_k(i, je+2, Nxt)]= 2.0*uw - u[ij_k(i, je-1, Nxt)];
     }
 }

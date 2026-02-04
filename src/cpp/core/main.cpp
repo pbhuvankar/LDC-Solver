@@ -6,6 +6,8 @@ int main() {
     Solver solver;
     
     //Initialize simulation
+    read_params(grid, mom, solver);
+
     initialize(grid, mom, solver);
     
     //Print OpenMP information
@@ -30,7 +32,8 @@ int main() {
     #endif
     
     //Set boundary conditions
-    UVBoundaryCond(mom.u, mom.v, grid);
+    double u_w = 1.0;
+    UVBoundaryCond(mom.u, mom.v, grid, u_w);
     
     //Calculate time step
     timestep(grid, mom);
@@ -50,104 +53,118 @@ int main() {
     {
         grid.itime++;
         mom.time +=mom.dt;
-                
-        //Reset dU & dV
-        std::fill(mom.du.begin(), mom.du.end(), 0.0);
-        std::fill(mom.dv.begin(), mom.dv.end(), 0.0);        
-        
-        //Convection
-        convection(mom.du, mom.dv, grid, mom);        
-        
-        //Diffusion for U-velocity
-        diffusionU(mom.du, grid.Sflag, grid, mom, solver);        
-        
-        if (grid.Semi_implicit) {
-            double res;
-            int ct;
-            //JORSolver(mom.u0, mom.ind, res, ct, grid, solver);
-            RedBlackSOR(mom.u0, mom.ind, res, ct, grid, solver);
-        }
-        
-        //Diffusion for V-velocity
-        diffusionV(mom.dv, grid.Sflag, grid, mom, solver);        
-        
-        if (grid.Semi_implicit) {
-            double res;
-            int ct;
-            //JORSolver(mom.v0, mom.ind, res, ct, grid, solver);
-            RedBlackSOR(mom.v0, mom.ind, res, ct, grid, solver);
-        }
-        
 
-        //Update intermediate velocities
-        if (!grid.Semi_implicit) {
-            for (size_t i=0; i< mom.u.size(); i++) {
-                mom.u0[i]=mom.u[i] + mom.du[i];
-                mom.v0[i]=mom.v[i] + mom.dv[i];
-            }
-        }
-        
-        //Apply boundary conditions to intermediate velocities
-        UVBoundaryCond(mom.u0, mom.v0, grid);
-        
-        //Set up Pressure Poisson equation
-        SetPressurePoi(grid, mom, solver);
-                
-        double res;
-        int ct;        
+        double t_count = 0;
+        RecordOldFields(grid, mom);
 
-        //Solve Pressure Poisson equation
-        if(solver.which_solver==1){
-          RedBlackSOR(mom.p, mom.ind, res, ct, grid, solver);    
-        }
-        else
+        while(t_count < solver.t_scheme)
         {
-          JORSolver(mom.p, mom.ind, res, ct, grid, solver);
-        }
-        
-
-        //Print output to screen every 50 time-steps
-        if ((grid.itime +1) % 50 ==0) {
-            
-            #ifdef _OPENMP
-            end_time = omp_get_wtime();
-            #endif
-
-            std::cout<< "I="<< grid.itime<< " dt="<< mom.dt 
-                     << " time="<< mom.time<< std::endl;
-            std::cout<< "Pressure residue: "<< res<< std::endl;
-            std::cout<< "Pressure iterations: "<< ct<< std::endl;
-            std::cout<< "===========================================" 
-                     << "==========================================="<< std::endl;
-            std::cout<< "Wtime= "<<end_time-start_time<<"\n";                     
-
-            #ifdef _OPENMP
-            start_time = omp_get_wtime();   
-            #endif      
-        }
-        
-        //Projection: Correct U, V from P field
-        projection(grid, mom);
+            t_count++;
                 
-        // pply boundary conditions U & V
-        UVBoundaryCond(mom.u, mom.v, grid);        
+            //Reset dU & dV
+            std::fill(mom.du.begin(), mom.du.end(), 0.0);
+            std::fill(mom.dv.begin(), mom.dv.end(), 0.0);        
         
-        //Output results right before final time
-        if (mom.time + mom.dt > mom.Tend) {
+            //Convection
+            convection(mom.du, mom.dv, grid, mom);        
+            
+            //Diffusion for U-velocity
+            diffusionU(mom.du, grid.Sflag, grid, mom, solver);        
+            
+            if (grid.Semi_implicit) {
+                double res;
+                int ct;
+                //JORSolver(mom.u0, mom.ind, res, ct, grid, solver);
+                RedBlackSOR(mom.u0, mom.ind, res, ct, grid, solver);
+            }
+        
+            //Diffusion for V-velocity
+            diffusionV(mom.dv, grid.Sflag, grid, mom, solver);        
+        
+            if (grid.Semi_implicit) {
+                double res;
+                int ct;
+                //JORSolver(mom.v0, mom.ind, res, ct, grid, solver);
+                RedBlackSOR(mom.v0, mom.ind, res, ct, grid, solver);
+            }
+        
 
-            #ifdef _OPENMP
-            prog_end_time = omp_get_wtime();
-            #endif
-            grid.prog_time = prog_end_time - prog_start_time;
+            //Update intermediate velocities
+            if (!grid.Semi_implicit) {
+                for (size_t i=0; i< mom.u.size(); i++) {
+                    mom.u0[i]=mom.u[i] + mom.du[i];
+                    mom.v0[i]=mom.v[i] + mom.dv[i];
+                }
+            }
+        
+            //Apply boundary conditions to intermediate velocities
+            double u_w = 1.0;
+            UVBoundaryCond(mom.u0, mom.v0, grid, u_w);
+        
+            //Set up Pressure Poisson equation
+            SetPressurePoi(grid, mom, solver);
+                
+            double res;
+            int ct;        
 
-            Output(grid, mom);
-            OutputCSV(grid, mom);            
-            TimeAnalysis(solver, grid);
+            //Solve Pressure Poisson equation
+            if(solver.which_solver==1){
+              RedBlackSOR(mom.p, mom.ind, res, ct, grid, solver);    
+            }
+            else
+            {
+              JORSolver(mom.p, mom.ind, res, ct, grid, solver);
+            }
+        
+
+            //Print output to screen every 50 time-steps
+            if ((grid.itime +1) % 50 ==0) {
+                
+                #ifdef _OPENMP
+                end_time = omp_get_wtime();
+                #endif
+
+                std::cout<< "I="<< grid.itime<< " dt="<< mom.dt 
+                         << " time="<< mom.time<< std::endl;
+                std::cout<< "Pressure residue: "<< res<< std::endl;
+                std::cout<< "Pressure iterations: "<< ct<< std::endl;
+                std::cout<< "===========================================" 
+                         << "==========================================="<< std::endl;
+                std::cout<< "Wtime= "<<end_time-start_time<<"\n";                     
+
+                #ifdef _OPENMP
+                start_time = omp_get_wtime();   
+                #endif      
+            }
+        
+            //Projection: Correct U, V from P field
+            projection(grid, mom);
+                
+            // pply boundary conditions U & V
+            UVBoundaryCond(mom.u, mom.v, grid, u_w);        
+            
+            //Output results right before final time
+            if (mom.time + mom.dt > mom.Tend) {
+
+                #ifdef _OPENMP
+                prog_end_time = omp_get_wtime();
+                #endif
+                grid.prog_time = prog_end_time - prog_start_time;
+
+                Output(grid, mom);
+                OutputCSV(grid, mom);            
+                TimeAnalysis(solver, grid);
+            }
+        
+            //Calculate time step
+            timestep(grid, mom); 
         }
-        
-        //Calculate time step
-        timestep(grid, mom);        
+        if(solver.t_scheme==2)
+        {
+            LeapFrog(grid, mom);
+        }       
     }
+
     
     std::cout << "\n========================================" << std::endl;
     std::cout << "Simulation completed successfully!" << std::endl;

@@ -14,7 +14,7 @@ Breakdown_Time = T
 mesh_ref = 1.0
 Semi_implicit=F
 //------------------------------
-cfl = 0.25
+cfl = 0.5
 
 //--End time--------------------
 
@@ -27,5 +27,10 @@ mu1 = 0.0025
 //-----Solver parameter--------
 //---1:SOR-RB--2:JOR-----------
 which_solver = 1
-Beta = 1.0
+
+//--Time Scheme--1st order/2nd order
+t_scheme = 1
+
+//---SOR params---------------
+Beta = 1.00
 maxit = 100

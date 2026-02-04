@@ -32,6 +32,7 @@ endif()
 # Options
 option(BUILD_OPENMP "Build with OpenMP support" ON)
 option(BUILD_SERIAL "Build serial version" ON)
+option(BUILD_TEST "Build test version" ON)
 option(ENABLE_PROFILING "Enable detailed profiling" OFF)
 
 # Compiler flags
@@ -70,6 +71,7 @@ message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "OpenMP support: ${BUILD_OPENMP}")
 message(STATUS "Serial version: ${BUILD_SERIAL}")
+message(STATUS "Test version: ${BUILD_TEST}")
 message(STATUS "Profiling: ${ENABLE_PROFILING}")
 if(APPLE)
     message(STATUS "Platform: macOS")

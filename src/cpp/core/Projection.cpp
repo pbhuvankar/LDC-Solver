@@ -78,3 +78,46 @@ void timestep(Grid& grid, Momentum& mom)
     mom.dt= grid.cfl * std::min(dtc, dtn);
     mom.dt= std::min(mom.dt, grid.Max_dt);
 }
+
+void RecordOldFields(Grid&grid, Momentum& mom)
+{
+    const int is= grid.is;
+    const int ie= grid.ie;
+    const int js= grid.js;
+    const int je= grid.je;
+    const int Nxt= grid.Nxt;
+
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int j= js-1; j<= je+1; j++) 
+    {
+        for (int i= is-1; i<= ie+1; i++) 
+        {
+            int ij= ij_k(i, j, Nxt);
+            mom.v_old[ij]= mom.v[ij];
+            mom.u_old[ij]= mom.u[ij];
+            mom.p_old[ij]= mom.p[ij];
+        }
+    }
+}
+
+void LeapFrog(Grid&grid, Momentum& mom)
+{
+    const int is= grid.is;
+    const int ie= grid.ie;
+    const int js= grid.js;
+    const int je= grid.je;
+    const int Nxt= grid.Nxt;
+
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int j= js-1; j<= je+1; j++) 
+    {
+        for (int i= is-1; i<= ie+1; i++) 
+        {
+            int ij= ij_k(i, j, Nxt);
+            mom.v[ij] = 0.5*(mom.v_old[ij] + mom.v[ij]);
+            mom.u[ij] = 0.5*(mom.u_old[ij] + mom.u[ij]);
+            mom.p[ij] = 0.5*(mom.p_old[ij] + mom.p[ij]);
+        }
+    }
+
+}
